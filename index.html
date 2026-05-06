@@ -537,7 +537,8 @@
     .paste-box textarea { min-height: 100px; font-size: 0.85rem; }
 
     /* Catalog grid */
-    .catalog-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* Catalog grid: single column on mobile so all cards are visible and scrollable */
+    .catalog-grid { grid-template-columns: 1fr; gap: 10px; }
     .product-card { padding: 12px; }
     .product-card h3 { font-size: 1rem; }
 

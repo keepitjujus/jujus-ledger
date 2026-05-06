@@ -1,1 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="juju's Ledger">
+<meta name="theme-color" content="#111008">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;juju's Transfer Ledger&quot;,&quot;short_name&quot;:&quot;juju's Ledger&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23111008&quot;,&quot;theme_color&quot;:&quot;%23F5C800&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111008'/><circle cx='50' cy='50' r='40' fill='%23F5C800'/><text x='50' y='65' font-size='45' text-anchor='middle' fill='%23111008' font-family='Arial Black'>J</text></svg>&quot;,&quot;sizes&quot;:&quot;any&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
+<title>juju's — Transfer Ledger</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #111008;
+    --yellow: #F5C800;
+    --yellow-dark: #D4A800;
+    --yellow-pale: #FFF8D6;
+    --red: #E03020;
+    --white: #FAFAF5;
+    --offwhite: #F2EFE3;
+    --gray: #E5E1D0;
+    --muted: #7A7060;
+    --green: #2A6B3A;
+    --green-light: #D0EAD6;
+    --border: #D8D3BE;
+    --shadow: rgba(17,16,8,0.15);
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--offwhite);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--black);
+    padding: 0 32px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    border-bottom: 4px solid var(--yellow);
+    min-height: 64px;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-mark {
+    width: 42px; height: 42px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--black);
+    letter-spacing: 0;
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    line-height: 1;
+  }
+  .header-title span { color: var(--yellow); }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .loc-chip {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 2px solid;
+  }
+  .loc-lee { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+  .loc-arrow { color: var(--muted); font-size: 0.9rem; }
+  .loc-gb { background: transparent; color: var(--yellow); border-color: var(--yellow); }
+
+  /* ─── TABS ─── */
+  .tabs {
+    background: var(--black);
+    display: flex;
+    padding: 0 32px;
+    gap: 2px;
+    border-bottom: 3px solid var(--yellow);
+  }
+  .tab {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding: 12px 20px 10px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #888;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all 0.15s;
+  }
+  .tab.active { color: var(--yellow); border-bottom-color: var(--yellow); }
+  .tab:hover:not(.active) { color: var(--white); }
+
+  /* ─── MAIN ─── */
+  .main { padding: 28px 32px; max-width: 1140px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ─── LABELS / UTIL ─── */
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-yellow { background: var(--yellow); color: var(--black); }
+  .btn-yellow:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+  .btn-black { background: var(--black); color: var(--white); }
+  .btn-black:hover { background: #2a2818; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--black); }
+  .btn-outline:hover { border-color: var(--yellow); color: var(--black); background: var(--yellow-pale); }
+  .btn-red { background: var(--red); color: white; }
+  .btn-red:hover { background: #b52010; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #1f5028; }
+
+  /* ─── FORM FIELDS ─── */
+  .field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+  .field label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .field input, .field select, .field textarea {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 11px;
+    background: white;
+    color: var(--black);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--yellow); }
+  .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+
+  /* ─── CATALOG ─── */
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .product-card {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .product-card:hover { border-color: var(--yellow); box-shadow: 0 4px 16px var(--shadow); }
+  .product-card.needs-review { border-color: var(--red); border-style: dashed; }
+  .cat-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 9px;
+    display: inline-block;
+  }
+  .cat-food { background: #FFE8B0; color: #7A4A00; }
+  .cat-bev  { background: #CCE8FF; color: #004A7A; }
+  .cat-supply { background: var(--green-light); color: var(--green); }
+  .cat-softserve { background: #FFD6F0; color: #7A005A; }
+  .cat-other { background: var(--gray); color: var(--muted); }
+  .cat-review { background: #FFE0DC; color: #A02010; border: 1px dashed #E03020; }
+  .review-banner {
+    background: #FFF0EE; border: 2px solid var(--red); border-radius: 8px;
+    padding: 14px 18px; margin-bottom: 20px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .review-banner .rb-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+  .review-banner .rb-body { flex: 1; }
+  .review-banner h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.06em; color: var(--red); margin-bottom: 4px; }
+  .review-banner p { font-size: 0.78rem; font-weight: 600; color: #7A2010; line-height: 1.5; }
+  .transfer-item.needs-review {
+    background: #FFF0EE;
+    border: 1.5px dashed var(--red);
+  }
+  .transfer-item.needs-review .item-name { color: var(--red); }
+  .review-flag {
+    font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--red); color: white; border-radius: 3px; padding: 1px 5px;
+    white-space: nowrap;
+  }
+  .item-pill.needs-review { background: #FFE0DC; color: var(--red); border: 1px dashed var(--red); }
+  .product-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 0.04em; margin-bottom: 2px; }
+  .product-card .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .product-card .price { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 500; color: var(--black); }
+  .product-card .unit-label { font-size: 0.72rem; color: var(--muted); font-weight: 700; }
+  .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; }
+  .icon-btn {
+    width: 26px; height: 26px;
+    border: none; border-radius: 5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; transition: all 0.1s;
+    background: var(--gray); color: var(--muted);
+  }
+  .icon-btn:hover.edit { background: var(--yellow); color: var(--black); }
+  .icon-btn:hover.del  { background: var(--red); color: white; }
+
+  .add-box {
+    background: var(--yellow-pale);
+    border: 2px dashed var(--yellow-dark);
+    border-radius: 10px;
+    padding: 22px 24px;
+  }
+  .add-box-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+    color: var(--yellow-dark);
+    margin-bottom: 14px;
+  }
+
+  /* Edit modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    padding: 28px 30px;
+    width: 480px;
+    max-width: 95vw;
+    border-top: 4px solid var(--yellow);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+  /* ─── LOG ─── */
+  .log-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+  .log-box {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 26px;
+  }
+  .log-box h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .subtitle { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-bottom: 20px; }
+
+  .transfer-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--yellow-pale);
+    border: 1.5px solid #E8D870;
+    border-radius: 7px;
+    margin-bottom: 7px;
+    font-size: 0.9rem;
+  }
+  .transfer-item .item-name { flex: 1; font-weight: 700; }
+  .transfer-item .item-qty-edit { display:flex; align-items:center; gap:4px; }
+  .transfer-item .item-cost { font-family: 'DM Mono', monospace; color: var(--black); font-weight: 600; font-size: 0.9rem; min-width:60px; text-align:right; }
+  .transfer-item .rm { background: none; border: none; cursor: pointer; color: #bbb; font-size: 0.95rem; line-height: 1; }
+  .transfer-item .rm:hover { color: var(--red); }
+
+  .total-bar {
+    background: var(--black);
+    border-radius: 8px;
+    padding: 13px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px;
+  }
+  .total-bar .label { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: #888; }
+  .total-bar .amount { font-family: 'DM Mono', monospace; font-size: 1.5rem; color: var(--yellow); }
+
+  /* Paste box */
+  .paste-box {
+    background: var(--black);
+    border-radius: 10px;
+    padding: 22px;
+    color: var(--white);
+  }
+  .paste-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em; color: var(--yellow); margin-bottom: 4px; }
+  .paste-box .sub { font-size: 0.78rem; color: #888; margin-bottom: 14px; line-height: 1.55; font-weight: 600; }
+  .paste-box textarea {
+    width: 100%; font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 6px; color: var(--white); padding: 10px; resize: vertical;
+    min-height: 120px; outline: none; margin-bottom: 10px; line-height: 1.6;
+  }
+  .paste-box textarea::placeholder { color: rgba(255,255,255,0.22); }
+  .parse-result { font-size: 0.72rem; font-family: 'DM Mono', monospace; color: var(--yellow); margin-top: 8px; min-height: 18px; }
+
+  .tip-box {
+    background: var(--yellow-pale);
+    border: 2px solid #E8D870;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 14px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+    line-height: 1.55;
+  }
+
+  /* ─── HISTORY ─── */
+  .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .history-table th {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 3px solid var(--black);
+    background: var(--black);
+    color: var(--yellow);
+  }
+  .history-table td { padding: 11px 14px; border-bottom: 1px solid var(--gray); vertical-align: top; }
+  .history-table tbody tr:hover td { background: var(--yellow-pale); }
+  .cost-cell { font-family: 'DM Mono', monospace; font-weight: 700; color: var(--black); }
+  .item-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .item-pill { font-size: 0.65rem; font-weight: 700; background: var(--gray); border-radius: 3px; padding: 2px 7px; color: var(--black); }
+  .danger-link { font-size: 0.72rem; font-weight: 800; color: var(--red); cursor: pointer; background: none; border: none; text-decoration: underline; }
+
+  /* ─── REPORT ─── */
+  .report-controls { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 26px; flex-wrap: wrap; }
+  .report-card {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .report-header {
+    background: var(--black);
+    padding: 16px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .report-header h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; color: var(--yellow); }
+  .report-header .meta { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #888; }
+  .report-section { padding: 20px 22px; border-bottom: 1px solid var(--gray); }
+  .report-section h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem; letter-spacing: 0.12em;
+    color: var(--muted); margin-bottom: 12px;
+  }
+  .report-line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; font-size: 0.9rem; font-weight: 600;
+    border-bottom: 1px dashed var(--gray);
+  }
+  .report-line:last-child { border-bottom: none; }
+  .report-line .r-qty { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 0.78rem; min-width: 90px; text-align: right; }
+  .report-line .r-cost { font-family: 'DM Mono', monospace; font-weight: 700; min-width: 90px; text-align: right; }
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; }
+  .cat-card {
+    border: 2px solid var(--border);
+    border-radius: 8px; padding: 13px 15px;
+    transition: border-color 0.15s;
+  }
+  .cat-card:hover { border-color: var(--yellow); }
+  .cat-card .cn { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .cat-card .ca { font-family: 'DM Mono', monospace; font-size: 1.15rem; font-weight: 700; }
+  .cat-card .ce { font-size: 0.7rem; color: var(--muted); font-weight: 700; margin-top: 3px; }
+  .report-total-row {
+    background: var(--yellow);
+    padding: 18px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .report-total-row .label { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.04em; }
+  .report-total-row .big-num { font-family: 'DM Mono', monospace; font-size: 2rem; font-weight: 700; }
+  .export-bar {
+    background: var(--offwhite);
+    border-top: 2px solid var(--border);
+    padding: 14px 22px;
+    display: flex; gap: 12px; align-items: center;
+    font-size: 0.82rem; font-weight: 700; color: var(--muted);
+    flex-wrap: wrap;
+  }
+
+  /* ─── EMPTY / TOAST ─── */
+  .empty-state { text-align: center; padding: 48px; color: var(--muted); }
+  .empty-state .big { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.04em; color: var(--border); display: block; margin-bottom: 10px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--black); color: var(--white);
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    padding: 11px 20px; border-radius: 8px;
+    border-left: 4px solid var(--yellow);
+    opacity: 0; transform: translateY(10px);
+    transition: all 0.2s; z-index: 999; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ─── KRISPY STRIPE ─── */
+  .krispy-stripe {
+    background: var(--yellow);
+    text-align: center;
+    padding: 5px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.22em;
+    color: var(--black);
+    overflow: hidden;
+  }
+  /* ─── MOBILE RESPONSIVE ─── */
+  @media (max-width: 700px) {
+
+    /* Layout */
+    .main { padding: 16px; padding-bottom: 80px; }
+    .header { padding: 0 16px; min-height: 54px; }
+    .header-title { font-size: 1.3rem; }
+    .logo-mark { width: 34px; height: 34px; font-size: 1.1rem; }
+    .header-right { gap: 4px; }
+    .loc-chip { font-size: 0.6rem; padding: 4px 8px; }
+    .krispy-stripe { font-size: 0.7rem; }
+
+    /* Hide desktop tabs — use bottom nav instead */
+    .tabs { display: none; }
+
+    /* Bottom nav bar */
+    .bottom-nav {
+      display: flex !important;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--black);
+      border-top: 3px solid var(--yellow);
+      z-index: 200;
+      height: 62px;
+    }
+    .bottom-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: none;
+      background: transparent;
+      color: #666;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s;
+      padding: 8px 4px;
+    }
+    .bottom-nav-btn .nav-icon { font-size: 1.2rem; line-height: 1; }
+    .bottom-nav-btn.active { color: var(--yellow); }
+
+    /* Log layout: stack vertically */
+    .log-layout { grid-template-columns: 1fr; gap: 16px; }
+    .log-box { padding: 18px; }
+    .log-box h2 { font-size: 1.4rem; }
+
+    /* Form rows: stack on mobile */
+    .form-row { flex-direction: column; gap: 10px; }
+    .field { min-width: 0 !important; flex: 1 1 auto !important; }
+    .date-row { flex-direction: column; }
+
+    /* Bigger touch targets for inputs */
+    .field input, .field select, .field textarea {
+      font-size: 1rem;
+      padding: 11px 12px;
+      min-height: 44px;
+    }
+    .btn { padding: 12px 18px; font-size: 0.82rem; min-height: 44px; }
+
+    /* Transfer items */
+    .transfer-item { flex-wrap: wrap; gap: 6px; padding: 10px; }
+    .transfer-item .item-name { font-size: 0.9rem; flex: 1 1 100%; }
+    .transfer-item .item-qty-edit input { width: 60px !important; min-height: 36px; font-size: 1rem !important; }
+    .transfer-item .item-cost { min-width: 0; }
+
+    /* Total bar */
+    .total-bar .amount { font-size: 1.3rem; }
+
+    /* Paste box */
+    .paste-box textarea { min-height: 100px; font-size: 0.85rem; }
+
+    /* Catalog grid */
+    /* Catalog grid: single column on mobile so all cards are visible and scrollable */
+    .catalog-grid { grid-template-columns: 1fr; gap: 10px; }
+    .product-card { padding: 12px; }
+    .product-card h3 { font-size: 1rem; }
+
+    /* History table: hide route/notes columns, keep key info */
+    .history-table th:nth-child(2),
+    .history-table td:nth-child(2),
+    .history-table th:nth-child(4),
+    .history-table td:nth-child(4) { display: none; }
+    .history-table th, .history-table td { padding: 8px 8px; font-size: 0.78rem; }
+
+    /* Report */
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+    .report-total-row .big-num { font-size: 1.4rem; }
+    .report-controls { flex-direction: column; gap: 10px; }
+    .export-bar { flex-direction: column; gap: 8px; }
+    .export-bar button { width: 100%; }
+
+    /* Modal */
+    .modal { padding: 22px 18px; }
+    .modal .form-row { flex-direction: column; }
+
+    /* Eyebrow */
+    .eyebrow { font-size: 0.6rem; }
+
+    /* Add box */
+    .add-box { padding: 16px; }
+  }
+
+  /* Desktop: hide bottom nav */
+  .bottom-nav { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="krispy-stripe">KEEP IT KRISPY &nbsp;✦&nbsp; juju's internal tools &nbsp;✦&nbsp; LEE ↔ GREAT BARRINGTON &nbsp;✦&nbsp; KEEP IT KRISPY</div>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="logo-mark">J</div>
+    <div class="header-title">juju's <span>Transfer Ledger</span></div>
+  </div>
+  <div class="header-right">
+    <span class="loc-chip loc-lee">Lee</span>
+    <span class="loc-arrow">→</span>
+    <span class="loc-chip loc-gb">Great Barrington</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('catalog')">Product Catalog</button>
+  <button class="tab" onclick="switchTab('log')">Log Transfer</button>
+  <button class="tab" onclick="switchTab('history')">Transfer History</button>
+  <button class="tab" onclick="switchTab('report')">Monthly Report</button>
+</div>
+
+<div class="main">
+
+  <!-- ═══ CATALOG ═══ -->
+  <div class="panel active" id="panel-catalog">
+    <div class="eyebrow">Products on the move</div>
+    <div class="catalog-grid" id="catalog-grid"></div>
+    <div class="add-box">
+      <div class="add-box-title">+ Add New Product</div>
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="field"><label>Product Name</label><input id="p-name" type="text" placeholder="e.g. Par Cooked Chicken"></div>
+        <div class="field" style="flex:0.55"><label>Unit</label><input id="p-unit" type="text" placeholder="bucket / case / bag"></div>
+        <div class="field" style="flex:0.5"><label>Cost / Unit ($)</label><input id="p-cost" type="number" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field" style="flex:0.55"><label>Category</label>
+          <select id="p-cat">
+            <option value="Food">Food</option>
+            <option value="Beverage">Beverage</option>
+            <option value="Soft-Serve">Soft-Serve</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Shorthand Aliases <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">— comma separated (e.g. chix, chicken, pcc)</span></label><input id="p-aliases" type="text" placeholder="e.g. chix, chicken, pcc"></div>
+        <button class="btn btn-yellow" onclick="addProduct()" style="align-self:flex-end;height:38px;flex:0 0 auto">Add Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LOG ═══ -->
+  <div class="panel" id="panel-log">
+    <div class="log-layout">
+      <div class="log-box">
+        <h2 id="log-title">Log a Transfer</h2>
+        <div class="subtitle" id="log-subtitle">What's riding from Lee to Great Barrington today?</div>
+        <div class="form-row" style="margin-bottom:18px">
+          <div class="field"><label>Transfer Date</label><input type="date" id="transfer-date"></div>
+          <div class="field"><label>From</label><input type="text" id="from-loc" value="Lee"></div>
+          <div class="field"><label>To</label><input type="text" id="to-loc" value="Great Barrington"></div>
+        </div>
+        <div class="eyebrow" style="margin-bottom:10px">Add items</div>
+        <div class="form-row" style="margin-bottom:12px">
+          <div class="field"><label>Product</label><select id="item-select"><option value="">-- pick a product --</option></select></div>
+          <div class="field" style="flex:0.5;min-width:80px"><label>Qty</label><input type="number" id="item-qty" min="1" value="1"></div>
+          <button class="btn btn-outline" onclick="addTransferItem()" style="height:38px;align-self:flex-end">+ Add</button>
+        </div>
+        <div id="transfer-items-list" style="margin-bottom:16px"><div style="color:var(--muted);font-size:0.82rem;padding:6px 0;font-weight:600">No items yet.</div></div>
+        <div class="total-bar"><span class="label">Transfer Total</span><span class="amount" id="transfer-total">$0.00</span></div>
+        <div class="field" style="margin-bottom:16px"><label>Notes (optional)</label><input type="text" id="transfer-notes" placeholder="e.g. Weekly haul, event prep, soft serve push..."></div>
+        <div style="display:flex;gap:10px">
+          <button id="cancel-edit-btn" class="btn btn-outline" style="display:none;flex:0 0 auto" onclick="cancelEdit()">✕ Cancel Edit</button>
+          <button id="save-btn" class="btn btn-green" style="flex:1;padding:13px;font-size:0.9rem" onclick="saveTransfer()">💾 Save Transfer</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="paste-box">
+          <h3>📲 Paste Employee Message</h3>
+          <div class="sub">Copy a text or email from your crew — the system matches items to your catalog and fills the form automatically.</div>
+          <textarea id="paste-input" placeholder="Today's haul:&#10;- 4 buckets chicken&#10;- 2 cases ice cream mix&#10;- 6 cases napkins&#10;- 3 cases syrup"></textarea>
+          <button class="btn btn-yellow" style="width:100%" onclick="parseMessage()">Parse &amp; Fill Form →</button>
+          <div class="parse-result" id="parse-result"></div>
+        </div>
+        <div class="tip-box">
+          <strong style="color:var(--black)">Pro Tip:</strong> Have your team text or email you a list each transfer day. Paste it above and it auto-matches to your catalog. Review, adjust, save — done in 30 seconds.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HISTORY ═══ -->
+  <div class="panel" id="panel-history">
+    <div class="eyebrow">All transfer logs</div>
+    <div id="history-container"></div>
+  </div>
+
+  <!-- ═══ REPORT ═══ -->
+  <div class="panel" id="panel-report">
+    <div class="report-controls">
+      <div class="field" style="min-width:160px"><label>Month</label>
+        <select id="report-month">
+          <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+          <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+          <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+          <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+        </select>
+      </div>
+      <div class="field" style="min-width:100px"><label>Year</label><input type="number" id="report-year" value="2026" min="2020" max="2099"></div>
+      <button class="btn btn-black" onclick="generateReport()" style="align-self:flex-end">Generate Report</button>
+    </div>
+    <div id="report-output"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══ MOBILE BOTTOM NAV ═══ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-btn active" onclick="switchTab('catalog')" id="bnav-catalog">
+    <span class="nav-icon">📦</span>Catalog
+  </button>
+  <button class="bottom-nav-btn" onclick="switchTab('log')" id="bnav-log">
+    <span class="nav-icon">📲</span>Log
+  </button>
+  <button class="bottom-nav-btn" onclick="switchTab('history')" id="bnav-history">
+    <span class="nav-icon">📋</span>History
+  </button>
+  <button class="bottom-nav-btn" onclick="switchTab('report')" id="bnav-report">
+    <span class="nav-icon">📊</span>Report
+  </button>
+</nav>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h2>Edit Product</h2>
+    <input type="hidden" id="edit-id">
+    <div class="form-row" style="margin-bottom:14px">
+      <div class="field"><label>Product Name</label><input id="edit-name" type="text"></div>
+      <div class="field" style="flex:0.55"><label>Unit</label><input id="edit-unit" type="text"></div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px">
+      <div class="field"><label>Cost per Unit ($)</label><input id="edit-cost" type="number" step="0.01" min="0"></div>
+      <div class="field"><label>Category</label>
+        <select id="edit-cat">
+          <option value="Food">Food</option>
+          <option value="Beverage">Beverage</option>
+          <option value="Soft-Serve">Soft-Serve</option>
+          <option value="Supplies">Supplies</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+      <div class="field"><label>Shorthand Aliases <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">— comma separated</span></label><input id="edit-aliases" type="text" placeholder="e.g. chix, chicken, pcc"></div>
+    </div>
+    <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:16px">These let employees write shorthand in messages — the parser will recognize any of these terms as this product.</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-yellow" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ───── STATE ─────
+let products = JSON.parse(localStorage.getItem('jj_products') || 'null');
+let transfers = JSON.parse(localStorage.getItem('jj_transfers') || 'null');
+let currentItems = [];
+let editingTransferId = null; // set when re-editing a saved transfer
+
+function uid() { return Math.random().toString(36).slice(2,10); }
+function fmtDate(d) { return d.toISOString().slice(0,10); }
+function save() {
+  localStorage.setItem('jj_products', JSON.stringify(products));
+  localStorage.setItem('jj_transfers', JSON.stringify(transfers));
+}
+function fmt$(n) { return '$' + (n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function catClass(cat) { return {Food:'cat-food',Beverage:'cat-bev','Soft-Serve':'cat-softserve',Supplies:'cat-supply'}[cat]||'cat-other'; }
+
+// ── Seed demo data ──
+if (!products) {
+  products = [
+    { id:uid(), name:'Par Cooked Chicken', unit:'Deep Hotel Pan', cost:120.00, category:'Food', aliases:'chix, chicken, par chix, par chicken', needsReview:false },
+    { id:uid(), name:'SSI-74 Neutral Ice Cream Mix', unit:'case', cost:145.00, category:'Soft-Serve', aliases:'ssi74, ssi-74, 74, neutral mix', needsReview:false },
+    { id:uid(), name:'Napkins', unit:'case', cost:62.00, category:'Supplies', aliases:'brown napkins, tork', needsReview:false },
+    { id:uid(), name:'Mojito Syrup', unit:'case', cost:108.00, category:'Beverage', aliases:'mojito, mint syrup, mint', needsReview:false },
+    { id:uid(), name:'Cold Cups (16oz)', unit:'case', cost:55.00, category:'Supplies', aliases:'drink cups', needsReview:false },
+    { id:uid(), name:'SSI-76 Chocolate Ice Cream Mix', unit:'case', cost:150.00, category:'Soft-Serve', aliases:'ssi76, ssi 76, 76, chocolate base, choco base, chocolate mix, choco mix', needsReview:false },
+    { id:uid(), name:'SSI-77 Dairy Free Ice Cream Mix', unit:'Case', cost:150.00, category:'Soft-Serve', aliases:'ssi77, ssi-77, ssi 77, dairy free mix', needsReview:false },
+    { id:uid(), name:'Strawberry Compound', unit:'1 KG', cost:30.00, category:'Soft-Serve', aliases:'strawberry flavor', needsReview:false },
+    { id:uid(), name:'Vanilla Compound', unit:'1 kg', cost:27.00, category:'Soft-Serve', aliases:'vanilla', needsReview:false },
+    { id:uid(), name:'Mango Compound', unit:'1 kf', cost:27.00, category:'Soft-Serve', aliases:'mango', needsReview:false },
+    { id:uid(), name:'Pina Colada Syrup', unit:'case', cost:95.00, category:'Beverage', aliases:'pina colada, pina', needsReview:false },
+    { id:uid(), name:'Chicken Cup (12oz)', unit:'case', cost:85.00, category:'Supplies', aliases:'chicken cup, 12oz cup', needsReview:false },
+    { id:uid(), name:'Waffle Cone Mix', unit:'case', cost:95.00, category:'Soft-Serve', aliases:'waffle cone, cone mix', needsReview:false },
+    { id:uid(), name:'Par Cooked Gluten Free Chicken', unit:'8 QT CAMBRO (8 orders)', cost:40.00, category:'Food', aliases:'gf chix, gf chicken, gf par', needsReview:false },
+    { id:uid(), name:'High Lawn Farm Whole Milk', unit:'gallon', cost:5.50, category:'Soft-Serve', aliases:'milk', needsReview:false },
+    { id:uid(), name:'Gyro Pita', unit:'case', cost:45.00, category:'Food', aliases:'pita, gyro', needsReview:false },
+    { id:uid(), name:'Cucumbers', unit:'unit', cost:2.00, category:'Food', aliases:'cukes, cucumber, cuke', needsReview:false },
+    { id:uid(), name:'Tart Froyo Soft Serve Base', unit:'case', cost:120.00, category:'Soft-Serve', aliases:'froyo, yoyo', needsReview:false },
+  ];
+}
+if (!transfers) {
+  transfers = [];
+}
+save();
+
+// ───── TABS ─────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  const tabs = ['catalog','log','history','report'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  const bnav = document.getElementById('bnav-'+name);
+  if (bnav) bnav.classList.add('active');
+  if (name==='catalog') renderCatalog();
+  if (name==='log') { renderItemSelect(); renderTransferItems(); }
+  if (name==='history') renderHistory();
+  if (name==='report') setDefaultMonth();
+}
+
+// ───── CATALOG ─────
+function renderCatalog() {
+  const g = document.getElementById('catalog-grid');
+  if (!products.length) {
+    g.innerHTML = '<div class="empty-state"><span class="big">NO PRODUCTS YET</span>Add your first product below.</div>';
+    return;
+  }
+  const reviewItems = products.filter(p => p.needsReview);
+  const banner = reviewItems.length ? `
+    <div class="review-banner" style="grid-column:1/-1">
+      <div class="rb-icon">⚠️</div>
+      <div class="rb-body">
+        <h4>${reviewItems.length} item${reviewItems.length!==1?'s':''} need your attention</h4>
+        <p>These products were auto-created from an employee message. Click ✏️ to set the correct unit, cost, and category before the next report.</p>
+      </div>
+    </div>` : '';
+  g.innerHTML = banner + products.map(p => `
+    <div class="product-card${p.needsReview?' needs-review':''}">
+      <div class="card-actions">
+        <button class="icon-btn edit" onclick="openEditModal('${p.id}')" title="Edit">✏️</button>
+        <button class="icon-btn del" onclick="deleteProduct('${p.id}')" title="Delete">✕</button>
+      </div>
+      <span class="cat-badge ${p.needsReview ? 'cat-review' : catClass(p.category)}">${p.needsReview ? '⚠ Needs Review' : p.category}</span>
+      <h3>${p.name}</h3>
+      <div class="price-row">
+        <span class="price">${p.needsReview ? '—' : fmt$(p.cost)}</span>
+        <span class="unit-label">per ${p.unit}</span>
+      </div>
+      ${p.aliases ? `<div style="margin-top:8px;font-size:0.68rem;color:var(--muted);font-weight:700;line-height:1.5"><span style="letter-spacing:0.06em;text-transform:uppercase;font-size:0.6rem">Aliases: </span>${p.aliases.split(',').map(a=>a.trim()).filter(Boolean).map(a=>`<span style="display:inline-block;background:var(--gray);border-radius:3px;padding:1px 6px;margin:1px 2px;font-family:'DM Mono',monospace;font-size:0.65rem">${a}</span>`).join('')}</div>` : ''}
+    </div>`).join('');
+}
+
+function addProduct() {
+  const name    = document.getElementById('p-name').value.trim();
+  const unit    = document.getElementById('p-unit').value.trim();
+  const cost    = parseFloat(document.getElementById('p-cost').value);
+  const cat     = document.getElementById('p-cat').value;
+  const aliases = document.getElementById('p-aliases').value.trim();
+  if (!name || !unit || isNaN(cost) || cost < 0) { toast('Fill in all fields!'); return; }
+  products.push({ id:uid(), name, unit, cost, category:cat, aliases });
+  save(); renderCatalog();
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-unit').value = '';
+  document.getElementById('p-cost').value = '';
+  document.getElementById('p-aliases').value = '';
+  toast('Product added ✓');
+}
+
+function deleteProduct(id) {
+  if (!confirm('Remove this product from the catalog?')) return;
+  products = products.filter(p => p.id !== id);
+  save(); renderCatalog(); toast('Product removed.');
+}
+
+// ── Edit modal ──
+function openEditModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('edit-id').value      = p.id;
+  document.getElementById('edit-name').value    = p.name;
+  document.getElementById('edit-unit').value    = p.unit;
+  document.getElementById('edit-cost').value    = p.cost;
+  document.getElementById('edit-cat').value     = p.category;
+  document.getElementById('edit-aliases').value = p.aliases || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
+function saveEdit() {
+  const id      = document.getElementById('edit-id').value;
+  const name    = document.getElementById('edit-name').value.trim();
+  const unit    = document.getElementById('edit-unit').value.trim();
+  const costRaw = document.getElementById('edit-cost').value;
+  const cost    = costRaw === '' ? 0 : parseFloat(costRaw);
+  const cat     = document.getElementById('edit-cat').value;
+  const aliases = document.getElementById('edit-aliases').value.trim();
+  if (!name || !unit || isNaN(cost) || cost < 0) { toast('Fill in all fields — cost can be 0 but not blank or negative.'); return; }
+
+  // Update the product record
+  const p = products.find(x => x.id === id);
+  if (p) { p.name=name; p.unit=unit; p.cost=cost; p.category=cat; p.aliases=aliases; p.needsReview=false; }
+
+  // ── Sync all saved transfers that contain this product ──
+  let syncedTransfers = 0;
+  transfers.forEach(t => {
+    let changed = false;
+    t.items.forEach(item => {
+      if (item.productId === id) {
+        item.name        = name;
+        item.unit        = unit;
+        item.cost        = cost;
+        item.line        = item.qty * cost;
+        item.needsReview = false;
+        changed = true;
+      }
+    });
+    if (changed) {
+      t.total = t.items.reduce((s, i) => s + i.line, 0);
+      syncedTransfers++;
+    }
+  });
+
+  // ── Sync active (unsaved) form items too ──
+  let syncedActive = false;
+  currentItems.forEach(item => {
+    if (item.productId === id) {
+      item.name        = name;
+      item.unit        = unit;
+      item.cost        = cost;
+      item.line        = item.qty * cost;
+      item.needsReview = false;
+      syncedActive = true;
+    }
+  });
+
+  save();
+  closeEditModal();
+  renderCatalog();
+  if (syncedActive) renderTransferItems();
+  // Re-render history if it's currently visible so pills update immediately
+  if (document.getElementById('panel-history').classList.contains('active')) renderHistory();
+
+  const parts = ['Product updated ✓'];
+  if (syncedTransfers > 0) parts.push(`synced across ${syncedTransfers} saved transfer${syncedTransfers!==1?'s':''}`);
+  if (syncedActive) parts.push('active form updated');
+  toast(parts.join(' — '));
+}
+document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
+
+// ───── LOG ─────
+function renderItemSelect() {
+  const sel = document.getElementById('item-select');
+  sel.innerHTML = '<option value="">-- pick a product --</option>' +
+    products.map(p => `<option value="${p.id}">${p.name} (${p.unit}) — ${fmt$(p.cost)}</option>`).join('');
+}
+
+function addTransferItem() {
+  const pid = document.getElementById('item-select').value;
+  const qty = parseInt(document.getElementById('item-qty').value) || 1;
+  if (!pid) { toast('Select a product first.'); return; }
+  const p = products.find(x => x.id === pid);
+  if (!p) return;
+  const ex = currentItems.find(i => i.productId === pid);
+  if (ex) { ex.qty += qty; ex.line = ex.qty * ex.cost; }
+  else currentItems.push({ productId:pid, name:p.name, unit:p.unit, cost:p.cost, qty, line:qty*p.cost });
+  renderTransferItems();
+  document.getElementById('item-qty').value = 1;
+}
+
+function removeTransferItem(pid) {
+  currentItems = currentItems.filter(i => i.productId !== pid);
+  renderTransferItems();
+}
+
+function renderTransferItems() {
+  const el = document.getElementById('transfer-items-list');
+  if (!currentItems.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:6px 0;font-weight:600">No items yet.</div>';
+    document.getElementById('transfer-total').textContent = '$0.00';
+    return;
+  }
+  el.innerHTML = currentItems.map(i => `
+    <div class="transfer-item${i.needsReview?' needs-review':''}">
+      <span class="item-name">${i.name}</span>
+      ${i.needsReview ? '<span class="review-flag">⚠ Needs Review</span>' : ''}
+      <span class="item-qty-edit">
+        <input
+          type="number" min="1" value="${i.qty}"
+          style="width:52px;font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;border:1.5px solid var(--border);border-radius:4px;padding:2px 6px;background:white;text-align:center"
+          onchange="updateTransferQty('${i.productId}', this.value)"
+          onclick="this.select()"
+        >
+        <span style="font-size:0.75rem;color:var(--muted);font-weight:700">${i.unit}${i.qty!==1?'s':''}</span>
+      </span>
+      <span class="item-cost">${i.needsReview ? '—' : fmt$(i.line)}</span>
+      <button class="rm" onclick="removeTransferItem('${i.productId}')">✕</button>
+    </div>`).join('');
+  document.getElementById('transfer-total').textContent = fmt$(currentItems.reduce((s,i)=>s+i.line,0));
+}
+
+function updateTransferQty(pid, val) {
+  const qty = Math.max(1, parseInt(val) || 1);
+  const item = currentItems.find(i => i.productId === pid);
+  if (!item) return;
+  item.qty = qty;
+  item.line = qty * item.cost;
+  // Re-render but keep focus-friendly — just update total and cost display
+  document.getElementById('transfer-total').textContent = fmt$(currentItems.reduce((s,i)=>s+i.line,0));
+  renderTransferItems();
+}
+
+function saveTransfer() {
+  if (!currentItems.length) { toast('Add at least one item!'); return; }
+  const date  = document.getElementById('transfer-date').value;
+  if (!date) { toast('Pick a date first!'); return; }
+  const from  = document.getElementById('from-loc').value.trim() || 'Lee';
+  const to    = document.getElementById('to-loc').value.trim()   || 'Great Barrington';
+  const notes = document.getElementById('transfer-notes').value.trim();
+  const total = currentItems.reduce((s,i) => s+i.line, 0);
+
+  if (editingTransferId) {
+    // Update existing transfer in-place
+    const idx = transfers.findIndex(t => t.id === editingTransferId);
+    if (idx !== -1) transfers[idx] = { id:editingTransferId, date, from, to, notes, total, items:JSON.parse(JSON.stringify(currentItems)) };
+    editingTransferId = null;
+    toast(`Transfer updated ✓  —  ${fmt$(total)}`);
+  } else {
+    transfers.push({ id:uid(), date, from, to, notes, total, items:JSON.parse(JSON.stringify(currentItems)) });
+    toast(`Transfer saved ✓  —  ${fmt$(total)}`);
+  }
+  save(); currentItems = []; renderTransferItems();
+  document.getElementById('transfer-notes').value = '';
+  document.getElementById('log-title').textContent = 'Log a Transfer';
+  document.getElementById('log-subtitle').textContent = "What's riding from Lee to Great Barrington today?";
+  document.getElementById('save-btn').textContent = '💾 Save Transfer';
+}
+
+function cancelEdit() {
+  editingTransferId = null;
+  currentItems = [];
+  renderTransferItems();
+  document.getElementById('transfer-notes').value = '';
+  document.getElementById('transfer-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('log-title').textContent = 'Log a Transfer';
+  document.getElementById('log-subtitle').textContent = "What's riding from Lee to Great Barrington today?";
+  document.getElementById('save-btn').textContent = '💾 Save Transfer';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+  toast('Edit cancelled.');
+}
+
+function reopenTransfer(id) {
+  const t = transfers.find(x => x.id === id);
+  if (!t) return;
+  // Load it into the log form
+  editingTransferId = id;
+  currentItems = JSON.parse(JSON.stringify(t.items));
+  document.getElementById('transfer-date').value = t.date;
+  document.getElementById('from-loc').value  = t.from;
+  document.getElementById('to-loc').value    = t.to;
+  document.getElementById('transfer-notes').value = t.notes || '';
+  document.getElementById('log-title').textContent = '✏️ Editing Transfer';
+  document.getElementById('log-subtitle').textContent = `Opened from history: ${t.date} — make changes and save.`;
+  document.getElementById('save-btn').textContent = '💾 Save Changes';
+  document.getElementById('cancel-edit-btn').style.display = 'block';
+  renderItemSelect();
+  renderTransferItems();
+  switchTab('log');
+  toast('Transfer opened for editing.');
+}
+
+// ── Parse employee message ──
+function parseMessage() {
+  const text = document.getElementById('paste-input').value;
+  // Strip ONLY bullet/dash/symbol prefixes — NOT digits — so "4 chix" stays "4 chix"
+  const lines = text.split('\n').map(l => l.replace(/^[\-•*)\s]+/,'').trim()).filter(Boolean);
+  currentItems = []; let matched = 0, created = 0;
+
+  // Normalize: lowercase, collapse hyphens/underscores/spaces so ssi-74 == ssi74 == ssi 74
+  function normalize(s) { return s.toLowerCase().replace(/[\-_]/g,'').replace(/\s+/g,' ').trim(); }
+  // Split a normalized string into word tokens
+  function tokens(s) { return s.replace(/[^\w\s]/g,' ').split(/\s+/).filter(Boolean); }
+
+  lines.forEach(line => {
+    // Extract the quantity — first number anywhere in the line
+    const numMatch = line.match(/(\d+)/);
+    if (!numMatch) return;
+    const qty = parseInt(numMatch[1]);
+
+    // Build a clean description: remove the qty number and strip unit words for name extraction
+    const desc = line.replace(/^\d+\s*/,'').replace(/\b(cases?|buckets?|bags?|rolls?|boxes?|packs?|units?|of)\b/gi,'').replace(/\s+/g,' ').trim();
+    const descLower   = desc.toLowerCase();
+    const descNorm    = normalize(desc);
+    const descTokens  = tokens(descNorm);
+
+    let best = null;
+
+    // ── Pass 1: alias match ──
+    // For each alias term (CSV), ALL words in that alias must appear as tokens in the description
+    for (const p of products) {
+      if (!p.aliases) continue;
+      const aliasList = p.aliases.split(',').map(a => a.trim()).filter(Boolean);
+      for (const alias of aliasList) {
+        const aliasTokens = tokens(normalize(alias));
+        if (!aliasTokens.length) continue;
+        const allFound = aliasTokens.every(at =>
+          descTokens.some(dt => dt === at || dt.includes(at) || at.includes(dt))
+        );
+        if (allFound) { best = p; break; }
+      }
+      if (best) break;
+    }
+
+    // ── Pass 2: fuzzy product name match (fallback) ──
+    if (!best) {
+      let bestScore = 0;
+      products.forEach(p => {
+        const nameTokens = tokens(normalize(p.name));
+        let score = 0;
+        nameTokens.forEach(nt => {
+          if (descTokens.some(dt => dt === nt || dt.includes(nt) || nt.includes(dt))) score++;
+        });
+        if (score > bestScore) { bestScore = score; best = p; }
+      });
+      if (bestScore === 0) best = null;
+    }
+
+    if (best) {
+      const ex = currentItems.find(i => i.productId === best.id);
+      if (ex) { ex.qty += qty; ex.line = ex.qty * ex.cost; }
+      else currentItems.push({ productId:best.id, name:best.name, unit:best.unit, cost:best.cost, qty, line:qty*best.cost });
+      matched++;
+    } else {
+      // Auto-create placeholder from the description text
+      const displayName = desc.length > 1
+        ? desc.charAt(0).toUpperCase() + desc.slice(1)
+        : line.trim();
+      const newProduct = { id:uid(), name:displayName, unit:'unit', cost:0, category:'Other', aliases:'', needsReview:true };
+      products.push(newProduct); save();
+      currentItems.push({ productId:newProduct.id, name:newProduct.name, unit:newProduct.unit, cost:0, qty, line:0, needsReview:true });
+      created++;
+    }
+  });
+
+  renderTransferItems();
+  const parts = [];
+  if (matched > 0) parts.push(`✓ ${matched} item${matched!==1?'s':''} matched`);
+  if (created > 0) parts.push(`⚠ ${created} unknown item${created!==1?'s':''} flagged for review`);
+  document.getElementById('parse-result').textContent = parts.length
+    ? parts.join(' — ')
+    : '⚠ Nothing recognized — check your product names in the catalog.';
+  document.getElementById('paste-input').value = '';
+  if (created > 0) toast(`${created} new item${created!==1?'s':''} need your review in the catalog!`);
+  else if (matched > 0) toast(`Parsed ${matched} items ✓`);
+}
+
+// ───── HISTORY ─────
+function renderHistory() {
+  const el = document.getElementById('history-container');
+  if (!transfers.length) {
+    el.innerHTML = '<div class="empty-state"><span class="big">NO TRANSFERS YET</span>Log your first transfer above.</div>';
+    return;
+  }
+  const sorted = [...transfers].sort((a,b) => b.date.localeCompare(a.date));
+  el.innerHTML = `<table class="history-table"><thead><tr>
+    <th>Date</th><th>Route</th><th>Items</th><th>Notes</th><th>Total</th><th></th>
+  </tr></thead><tbody>${sorted.map(t=>`
+    <tr>
+      <td style="font-family:'DM Mono',monospace;white-space:nowrap;font-size:0.82rem">${t.date}</td>
+      <td style="font-size:0.82rem;font-weight:700;white-space:nowrap">${t.from} → ${t.to}</td>
+      <td><div class="item-pills">${t.items.map(i=>`<span class="item-pill${i.needsReview?' needs-review':''}">${i.qty}× ${i.name}${i.needsReview?' ⚠':''}</span>`).join('')}</div></td>
+      <td style="color:var(--muted);font-size:0.8rem;font-weight:600">${t.notes||'—'}</td>
+      <td class="cost-cell" style="white-space:nowrap">${fmt$(t.total)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline" style="font-size:0.65rem;padding:4px 10px;margin-right:4px" onclick="reopenTransfer('${t.id}')">✏️ Edit</button>
+        <button class="danger-link" onclick="deleteTransfer('${t.id}')">delete</button>
+      </td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function deleteTransfer(id) {
+  if (!confirm('Delete this transfer record?')) return;
+  transfers = transfers.filter(t => t.id !== id);
+  save(); renderHistory(); toast('Deleted.');
+}
+
+// ───── REPORT ─────
+function setDefaultMonth() {
+  const now = new Date();
+  document.getElementById('report-month').value = now.getMonth();
+  document.getElementById('report-year').value  = now.getFullYear();
+}
+
+function generateReport() {
+  const month = parseInt(document.getElementById('report-month').value);
+  const year  = parseInt(document.getElementById('report-year').value);
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const filtered = transfers.filter(t => {
+    const d = new Date(t.date + 'T00:00:00');
+    return d.getFullYear()===year && d.getMonth()===month;
+  });
+  const el = document.getElementById('report-output');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-state"><span class="big">NO DATA</span>No transfers found for ${MONTHS[month]} ${year}.</div>`;
+    return;
+  }
+  const byProduct={}, byCategory={};
+  filtered.forEach(t => t.items.forEach(i => {
+    if (!byProduct[i.productId]) byProduct[i.productId] = { name:i.name, unit:i.unit, cost:i.cost, qty:0, total:0 };
+    byProduct[i.productId].qty   += i.qty;
+    byProduct[i.productId].total += i.line;
+    const cat = (products.find(p=>p.id===i.productId)||{}).category||'Other';
+    byCategory[cat] = (byCategory[cat]||0) + i.line;
+  }));
+  const grandTotal = filtered.reduce((s,t) => s+t.total, 0);
+  const prodRows   = Object.values(byProduct).sort((a,b) => b.total-a.total);
+  const catEntries = Object.entries(byCategory).sort((a,b) => b[1]-a[1]);
+  const expMap = { Food:'COGS – Food', Beverage:'COGS – Beverage', 'Soft-Serve':'COGS – Soft-Serve', Supplies:'Operating Supplies', Other:'General Expense' };
+  const copyData = { month:MONTHS[month], year, grandTotal, catEntries };
+
+  el.innerHTML = `
+  <div class="report-card">
+    <div class="report-header">
+      <h3>${MONTHS[month]} ${year} — Transfer Report</h3>
+      <span class="meta">${filtered.length} transfer event${filtered.length!==1?'s':''}</span>
+    </div>
+    <div class="report-section">
+      <h4>Items Transferred This Month</h4>
+      ${prodRows.map(p=>`<div class="report-line">
+        <span>${p.name}</span>
+        <span class="r-qty">${p.qty} ${p.unit}${p.qty!==1?'s':''}</span>
+        <span class="r-cost">${fmt$(p.total)}</span>
+      </div>`).join('')}
+    </div>
+    <div class="report-section">
+      <h4>Expense Categories — For Bookkeeping Team</h4>
+      <div class="cat-grid">
+        ${catEntries.map(([cat,amt])=>`<div class="cat-card">
+          <div class="cn">${cat}</div>
+          <div class="ca">${fmt$(amt)}</div>
+          <div class="ce">→ ${expMap[cat]||'General Expense'}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="report-total-row">
+      <span class="label">Total Inter-Location Transfer</span>
+      <span class="big-num">${fmt$(grandTotal)}</span>
+    </div>
+    <div class="export-bar">
+      <span>Transfer <strong>${fmt$(grandTotal)}</strong> from Lee account → Great Barrington account for ${MONTHS[month]} ${year}.</span>
+      <button class="btn btn-black" style="margin-left:auto" onclick='copyReport(${JSON.stringify(copyData)})'>📋 Copy Summary</button>
+    </div>
+  </div>`;
+}
+
+function copyReport(data) {
+  const lines = [
+    `juju's Transfer Report — ${data.month} ${data.year}`,
+    '='.repeat(42),
+    '', 'Expense Categories (for bookkeeping):',
+    ...data.catEntries.map(([c,a]) => `  ${c}: $${(+a).toFixed(2)}`),
+    '', `TOTAL TRANSFER: $${(+data.grandTotal).toFixed(2)}`,
+    '(Transfer from Lee account to Great Barrington account)'
+  ];
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(()=>toast('Report copied to clipboard ✓'))
+    .catch(()=>toast('Use Ctrl+C to copy the report.'));
+}
+
+// ───── TOAST ─────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ───── STARTUP SELF-HEAL ─────
+// Fix any stale transfer items whose product has since been resolved.
+// Runs once on load to repair data saved before the sync logic existed.
+(function healStaleReviewFlags() {
+  const resolvedIds = new Set(products.filter(p => !p.needsReview).map(p => p.id));
+  let healed = false;
+  transfers.forEach(t => {
+    t.items.forEach(item => {
+      if (item.needsReview && resolvedIds.has(item.productId)) {
+        const p = products.find(x => x.id === item.productId);
+        if (p) {
+          item.name        = p.name;
+          item.unit        = p.unit;
+          item.cost        = p.cost;
+          item.line        = item.qty * p.cost;
+          item.needsReview = false;
+          healed = true;
+        }
+      }
+    });
+    if (healed) t.total = t.items.reduce((s, i) => s + i.line, 0);
+  });
+  if (healed) save();
+})();
+
+// ───── INIT ─────
+document.getElementById('transfer-date').value = new Date().toISOString().slice(0,10);
+renderCatalog();
+</script>
+</body>
+</html>

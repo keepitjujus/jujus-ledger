@@ -759,25 +759,28 @@ function catClass(cat) { return {Food:'cat-food',Beverage:'cat-bev','Soft-Serve'
 // ── Seed demo data ──
 if (!products) {
   products = [
-    { id:uid(), name:'Par Cooked Chicken', unit:'bucket', cost:18.50, category:'Food', aliases:'chix, chicken, pcc' },
-    { id:uid(), name:'Ice Cream Mix', unit:'case', cost:42.00, category:'Soft-Serve', aliases:'icm, ice cream, mix' },
-    { id:uid(), name:'Napkins', unit:'case', cost:11.75, category:'Supplies', aliases:'naps, napkin' },
-    { id:uid(), name:'Syrup', unit:'case', cost:28.00, category:'Beverage', aliases:'syr, syrup' },
-    { id:uid(), name:'Cups (16oz)', unit:'case', cost:19.50, category:'Supplies', aliases:'cups, 16oz' },
-    { id:uid(), name:'Straws', unit:'case', cost:7.25, category:'Supplies', aliases:'straw' },
+    { id:uid(), name:'Par Cooked Chicken', unit:'Deep Hotel Pan', cost:120.00, category:'Food', aliases:'chix, chicken, par chix, par chicken', needsReview:false },
+    { id:uid(), name:'SSI-74 Neutral Ice Cream Mix', unit:'case', cost:145.00, category:'Soft-Serve', aliases:'ssi74, ssi-74, 74, neutral mix', needsReview:false },
+    { id:uid(), name:'Napkins', unit:'case', cost:62.00, category:'Supplies', aliases:'brown napkins, tork', needsReview:false },
+    { id:uid(), name:'Mojito Syrup', unit:'case', cost:108.00, category:'Beverage', aliases:'mojito, mint syrup, mint', needsReview:false },
+    { id:uid(), name:'Cold Cups (16oz)', unit:'case', cost:55.00, category:'Supplies', aliases:'drink cups', needsReview:false },
+    { id:uid(), name:'SSI-76 Chocolate Ice Cream Mix', unit:'case', cost:150.00, category:'Soft-Serve', aliases:'ssi76, ssi 76, 76, chocolate base, choco base, chocolate mix, choco mix', needsReview:false },
+    { id:uid(), name:'SSI-77 Dairy Free Ice Cream Mix', unit:'Case', cost:150.00, category:'Soft-Serve', aliases:'ssi77, ssi-77, ssi 77, dairy free mix', needsReview:false },
+    { id:uid(), name:'Strawberry Compound', unit:'1 KG', cost:30.00, category:'Soft-Serve', aliases:'strawberry flavor', needsReview:false },
+    { id:uid(), name:'Vanilla Compound', unit:'1 kg', cost:27.00, category:'Soft-Serve', aliases:'vanilla', needsReview:false },
+    { id:uid(), name:'Mango Compound', unit:'1 kf', cost:27.00, category:'Soft-Serve', aliases:'mango', needsReview:false },
+    { id:uid(), name:'Pina Colada Syrup', unit:'case', cost:95.00, category:'Beverage', aliases:'pina colada, pina', needsReview:false },
+    { id:uid(), name:'Chicken Cup (12oz)', unit:'case', cost:85.00, category:'Supplies', aliases:'chicken cup, 12oz cup', needsReview:false },
+    { id:uid(), name:'Waffle Cone Mix', unit:'case', cost:95.00, category:'Soft-Serve', aliases:'waffle cone, cone mix', needsReview:false },
+    { id:uid(), name:'Par Cooked Gluten Free Chicken', unit:'8 QT CAMBRO (8 orders)', cost:40.00, category:'Food', aliases:'gf chix, gf chicken, gf par', needsReview:false },
+    { id:uid(), name:'High Lawn Farm Whole Milk', unit:'gallon', cost:5.50, category:'Soft-Serve', aliases:'milk', needsReview:false },
+    { id:uid(), name:'Gyro Pita', unit:'case', cost:45.00, category:'Food', aliases:'pita, gyro', needsReview:false },
+    { id:uid(), name:'Cucumbers', unit:'unit', cost:2.00, category:'Food', aliases:'cukes, cucumber, cuke', needsReview:false },
+    { id:uid(), name:'Tart Froyo Soft Serve Base', unit:'case', cost:120.00, category:'Soft-Serve', aliases:'froyo, yoyo', needsReview:false },
   ];
 }
 if (!transfers) {
-  const d1 = new Date(2026,4,1), d2 = new Date(2026,4,2);
-  transfers = [
-    { id:uid(), date:fmtDate(d1), from:'Lee', to:'Great Barrington', notes:'Weekly haul', total:228.5,
-      items:[{productId:products[0].id,name:products[0].name,unit:products[0].unit,cost:products[0].cost,qty:4,line:74},
-             {productId:products[1].id,name:products[1].name,unit:products[1].unit,cost:products[1].cost,qty:2,line:84},
-             {productId:products[2].id,name:products[2].name,unit:products[2].unit,cost:products[2].cost,qty:6,line:70.5}]},
-    { id:uid(), date:fmtDate(d2), from:'Lee', to:'Great Barrington', notes:'', total:123,
-      items:[{productId:products[3].id,name:products[3].name,unit:products[3].unit,cost:products[3].cost,qty:3,line:84},
-             {productId:products[4].id,name:products[4].name,unit:products[4].unit,cost:products[4].cost,qty:2,line:39}]},
-  ];
+  transfers = [];
 }
 save();
 

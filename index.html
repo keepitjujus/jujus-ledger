@@ -35,6 +35,7 @@
     background: var(--offwhite);
     color: var(--black);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* ─── HEADER ─── */
@@ -293,7 +294,9 @@
 
   /* ─── LOG ─── */
   .log-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+  .log-sidebar { min-width: 0; }
   .log-box {
+    min-width: 0;
     background: white;
     border: 2px solid var(--border);
     border-radius: 10px;
@@ -506,10 +509,23 @@
     .bottom-nav-btn .nav-icon { font-size: 1.2rem; line-height: 1; }
     .bottom-nav-btn.active { color: var(--yellow); }
 
-    /* Log layout: stack vertically */
-    .log-layout { grid-template-columns: 1fr; gap: 16px; }
-    .log-box { padding: 18px; }
+    /* Log layout: single column, paste box floats to top */
+    .log-layout {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      /* force paste sidebar first */
+    }
+    .log-sidebar { order: -1; min-width: 0; width: 100%; }
+    .log-box { padding: 18px; order: 1; min-width: 0; width: 100%; }
     .log-box h2 { font-size: 1.4rem; }
+
+    /* Prevent ANY horizontal overflow on the log panel */
+    #panel-log, .log-layout, .log-box, .log-sidebar,
+    .paste-box, .tip-box, .transfer-items-list {
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+    }
 
     /* Form rows: stack on mobile */
     .form-row { flex-direction: column; gap: 10px; }
@@ -627,15 +643,31 @@
   <!-- ═══ LOG ═══ -->
   <div class="panel" id="panel-log">
     <div class="log-layout">
+
+      <!-- PASTE BOX — appears first on mobile via CSS order -->
+      <div class="log-sidebar">
+        <div class="paste-box">
+          <h3>📲 Paste Employee Message</h3>
+          <div class="sub">Copy a text or email from your crew — the system matches items to your catalog and fills the form automatically.</div>
+          <textarea id="paste-input" placeholder="Today's haul:&#10;- 4 buckets chicken&#10;- 2 cases ice cream mix&#10;- 6 cases napkins&#10;- 3 cases syrup"></textarea>
+          <button class="btn btn-yellow" style="width:100%" onclick="parseMessage()">Parse &amp; Fill Form →</button>
+          <div class="parse-result" id="parse-result"></div>
+        </div>
+        <div class="tip-box">
+          <strong style="color:var(--black)">Pro Tip:</strong> Have your team text or email you a list each transfer day. Paste it above and it auto-matches to your catalog. Review, adjust, save — done in 30 seconds.
+        </div>
+      </div>
+
+      <!-- MANUAL FORM — appears second on mobile -->
       <div class="log-box">
         <h2 id="log-title">Log a Transfer</h2>
-        <div class="subtitle" id="log-subtitle">What's riding from Lee to Great Barrington today?</div>
+        <div class="subtitle" id="log-subtitle">Review parsed items below, or add manually.</div>
         <div class="form-row" style="margin-bottom:18px">
           <div class="field"><label>Transfer Date</label><input type="date" id="transfer-date"></div>
           <div class="field"><label>From</label><input type="text" id="from-loc" value="Lee"></div>
           <div class="field"><label>To</label><input type="text" id="to-loc" value="Great Barrington"></div>
         </div>
-        <div class="eyebrow" style="margin-bottom:10px">Add items</div>
+        <div class="eyebrow" style="margin-bottom:10px">Add items manually</div>
         <div class="form-row" style="margin-bottom:12px">
           <div class="field"><label>Product</label><select id="item-select"><option value="">-- pick a product --</option></select></div>
           <div class="field" style="flex:0.5;min-width:80px"><label>Qty</label><input type="number" id="item-qty" min="1" value="1"></div>
@@ -650,18 +682,6 @@
         </div>
       </div>
 
-      <div>
-        <div class="paste-box">
-          <h3>📲 Paste Employee Message</h3>
-          <div class="sub">Copy a text or email from your crew — the system matches items to your catalog and fills the form automatically.</div>
-          <textarea id="paste-input" placeholder="Today's haul:&#10;- 4 buckets chicken&#10;- 2 cases ice cream mix&#10;- 6 cases napkins&#10;- 3 cases syrup"></textarea>
-          <button class="btn btn-yellow" style="width:100%" onclick="parseMessage()">Parse &amp; Fill Form →</button>
-          <div class="parse-result" id="parse-result"></div>
-        </div>
-        <div class="tip-box">
-          <strong style="color:var(--black)">Pro Tip:</strong> Have your team text or email you a list each transfer day. Paste it above and it auto-matches to your catalog. Review, adjust, save — done in 30 seconds.
-        </div>
-      </div>
     </div>
   </div>
 
